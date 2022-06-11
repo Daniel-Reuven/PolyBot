@@ -1,6 +1,7 @@
 from telegram.ext import Updater, MessageHandler, Filters
 from utils import search_download_youtube_video
 from loguru import logger
+from time import sleep
 
 
 class Bot:
@@ -44,13 +45,22 @@ class QuoteBot(Bot):
 
 class YoutubeBot(Bot):
     def _message_handler(self, incoming_msg, context):
-        num_results = 1
+        num_results = 2
         video_to_search_name = incoming_msg.message.text
         temp_file = search_download_youtube_video(video_to_search_name, num_results)
-        for file in temp_file:
-            self.send_text(incoming_msg, f'Your searched for the following string: {video_to_search_name}')
-            self.send_text(incoming_msg, f'Number of results set to: {num_results}')
-            self.send_video(incoming_msg, context, file)
+        # print used parameters
+        self.send_text(incoming_msg, f'Your searched for the following string: {video_to_search_name}')
+        sleep(1)
+        self.send_text(incoming_msg, f'Number of results set to: {num_results}')
+        sleep(1)
+        self.send_text(incoming_msg, 'Please wait...')
+        sleep(1)
+        if isinstance(temp_file, str):
+            self.send_text(incoming_msg, temp_file)
+        else:
+            if isinstance(temp_file, list):
+                for file in temp_file:
+                    self.send_video(incoming_msg, context, file)
 
 
 if __name__ == '__main__':
