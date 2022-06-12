@@ -1,5 +1,6 @@
 import os
 from youtube_dl import YoutubeDL
+from time import sleep
 
 
 def search_download_youtube_video(video_name, num_results):
@@ -9,24 +10,25 @@ def search_download_youtube_video(video_name, num_results):
     :param num_results: integer representing how many videos to download
     :return: list of paths to your downloaded video files
     """
+    dlflag = False
     ydl = {'noplaylist': 'True', 'format': 'bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4'}
-    # ydl = {'noplaylist': 'True', 'format': 'bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4+best[height<=480]'}
     with YoutubeDL(ydl) as ydl:
         ydl.cache.remove()
+
         # 1. get a list of video file names with download=false
         videos = ydl.extract_info(f"ytsearch{num_results}:{video_name}", download=False)['entries']
-        # for each file name in list, check if exists, if not download.
+        # for each file name in list, check duration limits, then if exists, if not download.
         for video in videos:
-            # print(os.getcwd())
-            # print('filename:')
-            # print(f'{ydl.prepare_filename(video)}')
-            # print('does it exist locally')
-            # print(os.path.isfile(f'{ydl.prepare_filename(video)}'))
             if video['duration'] >= 900:
                 return "Error, selected track/s are above defined duration limit"
             if video['duration'] <= 0.1:
                 return "Error, selected track/s are below defined duration limit"
-        if not (os.path.isfile(f'{ydl.prepare_filename(video)}')):
+            if not (os.path.isfile(f'{ydl.prepare_filename(video)}')):
+                dlflag = True
+            # return list either way.
+        sleep(1)
+        if dlflag is True:
             dlvideos = ydl.extract_info(f"ytsearch{num_results}:{video_name}", download=True)['entries']
-        # return list either way.
-    return [ydl.prepare_filename(video) for video in dlvideos]
+            return [ydl.prepare_filename(video) for video in dlvideos]
+        else:
+            return [ydl.prepare_filename(video) for video in videos]
