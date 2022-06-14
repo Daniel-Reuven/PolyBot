@@ -100,7 +100,7 @@ class YoutubeBot(Bot):
 
 
 if __name__ == '__main__':
-    with open('file.telegramToken') as f:
+    with open('.telegramToken') as f:
         _token = f.read()
 
     # Original Bot
