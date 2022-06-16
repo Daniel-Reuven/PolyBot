@@ -11,7 +11,7 @@ def search_download_youtube_video(video_name, num_results):
     :return: list of paths to your downloaded video files
     """
     dlflag = False
-    ydl = {'noplaylist': 'True', 'format': 'bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4'}
+    ydl = {'noplaylist': 'True', 'format': 'bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4', 'outtmpl': '/./ytdlAppData/%(id)s.%(ext)s'}
     with YoutubeDL(ydl) as ydl:
         ydl.cache.remove()
 
