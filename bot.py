@@ -101,7 +101,7 @@ class YoutubeBot(Bot):
                             num_results = ivar
                             self.send_text(incoming_msg, f'Successfully Changed to: {ivar}')
                         except:
-                            self.send_text(incoming_msg, f'Unable to comply, an error has occured.')
+                            self.send_text(incoming_msg, f'Unable to comply, an error has occurred.')
                             print("An exception occurred")
                 else:
                     self.send_text(incoming_msg, 'Please use the correct command for this syntax, type "?help" to get more information.')

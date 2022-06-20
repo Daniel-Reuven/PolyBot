@@ -36,4 +36,4 @@ def search_download_youtube_video(video_name, num_results):
             else:
                 return [ydl.prepare_filename(video) for video in videos]
     except:
-        return "Error, Server error has occured"
+        return "Error, Server error has occurred"
