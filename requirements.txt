@@ -1,3 +1,5 @@
 python-telegram-bot>=13.11
 youtube-dl>=2021.12.17
 loguru~=0.6.0
+boto3>=1.24.13
+botocore~=1.27.13

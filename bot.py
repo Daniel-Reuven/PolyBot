@@ -112,7 +112,7 @@ class YoutubeBot(Bot):
                 sleep(1)
                 self.send_text(incoming_msg, f'Number of results set to: {num_results} \nPlease wait...')
                 sleep(1)
-                temp_file = search_download_youtube_video(inbound_text, num_results)
+                temp_file = search_download_youtube_video(inbound_text, num_results, s3_bucket_name)
                 if isinstance(temp_file, str):
                     self.send_text(incoming_msg, temp_file)
                 else:
@@ -137,6 +137,7 @@ if __name__ == '__main__':
 
     # Define initial max number of results
     num_results = 1
+    s3_bucket_name = 'daniel-reuven-ytdlAppData'
     # Starting a YouTube Bot:
     ytbot = YoutubeBot(_token)
     ytbot.start()
