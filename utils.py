@@ -34,9 +34,11 @@ def search_download_youtube_video(video_name, num_results, s3_bucket_name):
                     dlflag = True
                 # check aws s3 bucket for file
                 # if not (check_s3_file(ydl.prepare_filename(video), s3_bucket_name)):
-                #     dlflag = True
+                #     video_url = video.get("url", None)
+                #     ydl.extract_info(video_url, download=True)
+                #     upload_file(ydl.prepare_filename(video), s3_bucket_name)
             sleep(1)
-            # Download files if required and return the list of files
+            # Download files if required and return the list of files, will not be relevant if above code will work, only need to return the list of filenames/urls from s3
             if dlflag is True:
                 dlvideos = ydl.extract_info(f"ytsearch{num_results}:{video_name}", download=True)['entries']
                 # for video in dlvideos:
