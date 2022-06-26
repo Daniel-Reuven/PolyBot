@@ -15,7 +15,6 @@ def search_download_youtube_video(video_name, num_results, s3_bucket_name):
     :return: list of paths to your downloaded video files
     """
     # Flag to check if file/s exist on server or download is required
-    # dlflag = False
     # Parameters for youtube_dl use
     ydl = {'noplaylist': 'True', 'format': 'bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4', 'outtmpl': '/./ytdlAppData/%(id)s.%(ext)s'}
     # Try to download and return list of video/s or error msg
@@ -57,7 +56,6 @@ def search_download_youtube_video(video_name, num_results, s3_bucket_name):
 #         return False
 def check_s3_file(key_filename, s3_bucket_name):
     s3 = boto3.resource('s3')
-
     try:
         s3.Object(s3_bucket_name, key_filename).load()
     except botocore.exceptions.ClientError as e:
