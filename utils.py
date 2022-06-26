@@ -2,6 +2,7 @@ import logging
 import os
 import boto3
 from botocore.exceptions import ClientError
+import botocore
 from youtube_dl import YoutubeDL
 from time import sleep
 
@@ -14,7 +15,7 @@ def search_download_youtube_video(video_name, num_results, s3_bucket_name):
     :return: list of paths to your downloaded video files
     """
     # Flag to check if file/s exist on server or download is required
-    dlflag = False
+    # dlflag = False
     # Parameters for youtube_dl use
     ydl = {'noplaylist': 'True', 'format': 'bestvideo[ext=mp4]+bestaudio[ext=mp4]/mp4', 'outtmpl': '/./ytdlAppData/%(id)s.%(ext)s'}
     # Try to download and return list of video/s or error msg
@@ -29,47 +30,70 @@ def search_download_youtube_video(video_name, num_results, s3_bucket_name):
                     return "Error, selected track/s are above predefined duration limit"
                 if video['duration'] <= 0.1:
                     return "Error, selected track/s are below predefined duration limit"
-                # check local for file
-                if not (os.path.isfile(f'{ydl.prepare_filename(video)}')):
-                    dlflag = True
-                # check aws s3 bucket for file
-                # if not (check_s3_file(ydl.prepare_filename(video), s3_bucket_name)):
-                #     video_url = video.get("url", None)
-                #     ydl.extract_info(video_url, download=True)
-                #     upload_file(ydl.prepare_filename(video), s3_bucket_name)
-            sleep(1)
-            # Download files if required and return the list of files, will not be relevant if above code will work, only need to return the list of filenames/urls from s3
-            if dlflag is True:
-                dlvideos = ydl.extract_info(f"ytsearch{num_results}:{video_name}", download=True)['entries']
-                # for video in dlvideos:
-                #     if not (check_s3_file(ydl.prepare_filename(video), s3_bucket_name)):
-                #         upload_file(ydl.prepare_filename(video), s3_bucket_name)
-                return [ydl.prepare_filename(video) for video in dlvideos]
-            else:
-                # for video in videos:
-                #     s3 = boto3.client('s3')
-                #     s3.download_file(s3_bucket_name, ydl.prepare_filename(video), ydl.prepare_filename(video))
-                return [ydl.prepare_filename(video) for video in videos]
+                prefix = 'ytdlAppData/' + video['id'] + '.mp4'
+                # print(prefix)
+                # check aws s3 bucket for file, then locally and act accordingly,prefix != ydl.prepare_filename(video)
+                if not (check_s3_file(prefix, s3_bucket_name)):
+                    if not (os.path.isfile(ydl.prepare_filename(video))):
+                        video_url = video['webpage_url']
+                        ydl.extract_info(video_url, download=True)
+                        upload_file(prefix, s3_bucket_name)
+                    else:
+                        upload_file(prefix, s3_bucket_name)
+                else:
+                    if not (os.path.isfile(ydl.prepare_filename(video))):
+                        download_file(prefix, s3_bucket_name)
+                sleep(1)
+            return [ydl.prepare_filename(video) for video in videos]
     except:
         return "Error, Server error has occurred"
 
 
+# def check_s3_file(key_filename, s3_bucket_name):
+#     objs = list(s3_bucket_name.objects.filter(Prefix=key_filename))
+#     if len(objs) > 0 and objs[0].key == key_filename:
+#         return True
+#     else:
+#         return False
 def check_s3_file(key_filename, s3_bucket_name):
-    objs = list(s3_bucket_name.objects.filter(Prefix=key_filename))
-    if len(objs) > 0 and objs[0].key == key_filename:
-        return True
+    s3 = boto3.resource('s3')
+
+    try:
+        s3.Object(s3_bucket_name, key_filename).load()
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            # The object does not exist.
+            return False
+        else:
+            # Something else has gone wrong.
+            raise
     else:
-        return False
+        # The object does exist.
+        return True
 
 
 def upload_file(key_filename, bucket, object_name=None):
     # Upload the file
     s3_client = boto3.client('s3')
-    # If S3 object_name was not specified, use file_name
+    # If S3 object_name was not specified, use key_filename
     if object_name is None:
-        object_name = os.path.basename(key_filename)
+        object_name = key_filename
     try:
         response = s3_client.upload_file(key_filename, bucket, object_name)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
+
+
+def download_file(key_filename, bucket, object_name=None):
+    # Upload the file
+    s3_client = boto3.client('s3')
+    # If S3 object_name was not specified, use key_filename
+    if object_name is None:
+        object_name = key_filename
+    try:
+        response = s3_client.download_file(bucket, object_name, key_filename)
     except ClientError as e:
         logging.error(e)
         return False

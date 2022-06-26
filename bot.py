@@ -137,7 +137,7 @@ if __name__ == '__main__':
 
     # Define initial max number of results
     num_results = 1
-    s3_bucket_name = 'daniel-reuven-ytdlAppData'
+    s3_bucket_name = 'daniel-reuven-awsdemo-bucket'
     # Starting a YouTube Bot:
     ytbot = YoutubeBot(_token)
     ytbot.start()
