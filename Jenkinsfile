@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Trigger Deploy') {
             steps {
-                build job: BotDeploy, wait: false, parameters: [
+                build job: 'BotDeploy', wait: false, parameters: [
                 string(name: 'current-ecr-img-name', value: "$IMAGE_NAME:$IMAGE_TAG")
                 ]
             }
