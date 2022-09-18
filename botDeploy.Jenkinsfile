@@ -18,7 +18,6 @@ pipeline {
             }
             steps {
                 sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG" --query "Reservations[].Instances[]" > hosts.json'
-                sh 'cat hosts.json'
                 sh 'python3 prepare_ansible_inv.py'
                 sh '''
                 echo "Inventory generated"
@@ -33,9 +32,10 @@ pipeline {
                 REGISTRY_REGION = 'eu-central-1'
             }
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ec2-user', usernameVariable: 'ec2-user', keyFileVariable: 'privatekey')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ec2-user', usernameVariable: 'ssh-user', keyFileVariable: 'privatekey')]) {
                     sh '''
-                    /var/lib/jenkins/.local/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$BOT_IMAGE" --user=${ssh_user} -i hosts --private-key ${privatekey}
+                    /var/lib/jenkins/.local/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$BOT_IMAGE"
+                    --user=${ssh-user} -i hosts --private-key ${privatekey}
                     '''
                 }
             }
