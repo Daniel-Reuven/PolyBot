@@ -1,3 +1,6 @@
+properties([parameters([string('current-ecr-img-name')])])
+
+
 pipeline {
     agent any
 
