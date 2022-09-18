@@ -27,7 +27,7 @@ pipeline {
     post{
         always {
             sh '''
-                echo "Post - Always section - remove the container from jenkins"
+                echo "Post - Always section - remove the container from jenkins1"
                 docker rmi $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
             '''
         }
