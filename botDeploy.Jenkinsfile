@@ -32,10 +32,10 @@ pipeline {
                 REGISTRY_REGION = 'eu-central-1'
             }
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ec2-user', usernameVariable: 'ssh-user', keyFileVariable: 'privatekey')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ec2-user', usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
                     sh '''
                     /var/lib/jenkins/.local/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$BOT_IMAGE"
-                    --user=${ssh-user} -i hosts --private-key ${privatekey}
+                    --user=${ssh_user} -i hosts --private-key ${privatekey}
                     '''
                 }
             }
