@@ -2,19 +2,38 @@ pipeline {
     agent any
 
     stages {
-        stage('Build Bot app') {
+        stage("Install Ansible") {
             steps {
-                sh 'echo "stage I..."'
+                sh 'python3 -m pip install ansible'
+                sh '/var/lib/jenkins/.local/bin/ansible-galaxy collection install community.general'
             }
         }
-        stage('Stage II') {
+        stage("Generate Ansible Inventory") {
+            environment {
+                BOT_EC2_APP_TAG = "daniel-reuven-polybot-deployed"
+                BOT_EC2_REGION = "eu-central-1"
+            }
             steps {
-                sh 'echo "stage II..."'
+                sh 'aws ec2 describe-instances --region $BOT_EC2_REGION --filters "Name=tag:App,Values=$BOT_EC2_APP_TAG" --query "Reservations[].Instances[]" > hosts.json'
+                sh 'python3 prepare_ansible_inv.py'
+                sh '''
+                echo "Inventory generated"
+                cat hosts
+                '''
             }
         }
-        stage('Stage III ...') {
+        stage('Ansible Bot Deploy') {
+            environment {
+                ANSIBLE_HOST_KEY_CHECKING = 'False'
+                REGISTRY_URL = "352708296901.dkr.ecr.eu-central-1.amazonaws.com"
+                REGISTRY_REGION = 'eu-central-1'
+            }
             steps {
-                sh 'echo echo "stage III..."'
+                withCredentials([sshUserPrivateKey(credentialsId: 'bot-machine', usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
+                    sh '''
+                    /var/lib/jenkins/.local/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$BOT_IMAGE" --user=${ssh_user} -i hosts --private-key ${privatekey}
+                    '''
+                }
             }
         }
     }
