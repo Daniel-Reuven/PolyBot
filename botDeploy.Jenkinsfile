@@ -1,8 +1,9 @@
-properties([parameters([string('current-ecr-img-name')])])
-
 
 pipeline {
     agent any
+    parameters {
+        string(name: 'BOT_IMAGE_NAME')
+    }
 
     stages {
         stage("Install Ansible") {
@@ -34,7 +35,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'jenkins-ec2-user', usernameVariable: 'ssh_user', keyFileVariable: 'privatekey')]) {
                     sh '''
-                    /var/lib/jenkins/.local/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$daniel-reuven-ecr" --user=${ssh_user} -i hosts --private-key ${privatekey}
+                    /var/lib/jenkins/.local/bin/ansible-playbook botDeploy.yaml --extra-vars "registry_region=$REGISTRY_REGION  registry_url=$REGISTRY_URL bot_image=$BOT_IMAGE_NAME" --user=${ssh_user} -i hosts --private-key ${privatekey}
                     '''
                 }
             }
