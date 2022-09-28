@@ -31,6 +31,7 @@ pipeline {
                     sh '''
                     snyk container test $IMAGE_NAME:$IMAGE_TAG --severity-threshold=high --file=Dockerfile
                     '''
+                    }
                sh '''
                     docker tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
                     docker push $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
