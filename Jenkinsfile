@@ -27,11 +27,11 @@ pipeline {
                     aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 352708296901.dkr.ecr.eu-central-1.amazonaws.com
                     docker build -t $IMAGE_NAME .
                '''
-               withCredentials([string(credentialsId: 'snyk', variable: 'ad811150-43d1-4bb1-b7c8-a9e8efba90fd')]) {
-                    sh '''
-                    snyk container test $IMAGE_NAME:$IMAGE_TAG --severity-threshold=high --file=Dockerfile
-                    '''
-                    }
+//                withCredentials([string(credentialsId: 'snyk', variable: 'ad811150-43d1-4bb1-b7c8-a9e8efba90fd')]) {
+//                     sh '''
+//                     snyk container test $IMAGE_NAME:$IMAGE_TAG --severity-threshold=high --file=Dockerfile
+//                     '''
+//                     }
                sh '''
                     docker tag $IMAGE_NAME $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
                     docker push $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
