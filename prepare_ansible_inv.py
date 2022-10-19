@@ -12,7 +12,6 @@ def get_instance_name(tags):
 def prepare_ansible_inventory():
     with open('hosts.json') as f:
         instances = json.load(f)
-
     hosts = []
     for instance in instances:
         instance_name = get_instance_name(instance['Tags'])
