@@ -28,5 +28,4 @@ def prepare_ansible_inventory():
 
 
 if __name__ == '__main__':
-
     prepare_ansible_inventory()
