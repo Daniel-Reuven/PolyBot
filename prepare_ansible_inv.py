@@ -21,7 +21,7 @@ def prepare_ansible_inventory():
         hosts.append(
             f"{instance_name} ansible_host={instance_ip}\n"
         )
-
+    print(hosts)
     with open('hosts', 'w') as f:
         f.write('[bot]\n')
         f.writelines(hosts)
