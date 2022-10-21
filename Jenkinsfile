@@ -52,9 +52,6 @@ pipeline {
                 echo "Post - Always section - remove the container from jenkins1"
                 docker rmi $REGISTRY_URL/$IMAGE_NAME:$IMAGE_TAG
             '''
-//             script {
-//                 currentBuild.description = ("Branch : ${JOB.branch}\n GitCommiter : ${JOB.commitAuthor}\nGitLastMassage: ${JOB.lastCommitMassage}")
-//             }
         }
     }
 }
